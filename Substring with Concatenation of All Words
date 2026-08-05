@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    char* word;
+    int expected_count;
+    int current_count;
+} WordFreq;
+
+int findWordIndex(WordFreq* table, int table_size, const char* str, int len) {
+    for (int i = 0; i < table_size; i++) {
+        if (strncmp(table[i].word, str, len) == 0 && table[i].word[len] == '\0') {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int* findSubstring(char* s, char** words, int wordsSize, int* returnSize) {
+    *returnSize = 0;
+    if (!s || !words || wordsSize == 0) return NULL;
+
+    int s_len = strlen(s);
+    int word_len = strlen(words[0]);
+    int total_len = word_len * wordsSize;
+
+    if (s_len < total_len) return NULL;
+
+    WordFreq* table = (WordFreq*)malloc(sizeof(WordFreq) * wordsSize);
+    int table_size = 0;
+
+    for (int i = 0; i < wordsSize; i++) {
+        int idx = findWordIndex(table, table_size, words[i], word_len);
+        if (idx != -1) {
+            table[idx].expected_count++;
+        } else {
+            table[table_size].word = words[i];
+            table[table_size].expected_count = 1;
+            table[table_size].current_count = 0;
+            table_size++;
+        }
+    }
+
+    int* result = (int*)malloc(sizeof(int) * s_len);
+
+    for (int i = 0; i < word_len; i++) {
+        int left = i;
+        int right = i;
+        int count = 0;
+
+        for (int j = 0; j < table_size; j++) {
+            table[j].current_count = 0;
+        }
+
+        while (right + word_len <= s_len) {
+            char* word_ptr = s + right;
+            right += word_len;
+
+            int idx = findWordIndex(table, table_size, word_ptr, word_len);
+
+            if (idx != -1) {
+                table[idx].current_count++;
+                count++;
+
+                while (table[idx].current_count > table[idx].expected_count) {
+                    char* left_word_ptr = s + left;
+                    int left_idx = findWordIndex(table, table_size, left_word_ptr, word_len);
+                    
+                    table[left_idx].current_count--;
+                    count--;
+                    left += word_len;
+                }
+
+                if (count == wordsSize) {
+                    result[(*returnSize)++] = left;
+                }
+            } else {
+                for (int j = 0; j < table_size; j++) {
+                    table[j].current_count = 0;
+                }
+                count = 0;
+                left = right;
+            }
+        }
+    }
+
+    free(table);
+    return result;
+}
