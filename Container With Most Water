@@ -1,0 +1,29 @@
+#include <stdio.h>
+
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
+int maxArea(int* height, int heightSize) {
+    int max_water = 0;
+    int left = 0;
+    int right = heightSize - 1;
+    
+    while (left < right) {
+        int width = right - left;
+        
+        int current_water = width * min(height[left], height[right]);
+        
+        if (current_water > max_water) {
+            max_water = current_water;
+        }
+        
+        if (height[left] < height[right]) {
+            left++;
+        } else {
+            right--;
+        }
+    }
+    
+    return max_water;
+}
