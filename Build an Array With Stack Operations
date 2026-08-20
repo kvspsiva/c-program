@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char** buildArray(int* target, int targetSize, int n, int* returnSize) {
+    int maxOps = 2 * target[targetSize - 1];
+    char** result = (char**)malloc(sizeof(char*) * maxOps);
+    
+    int opsCount = 0;
+    int targetIdx = 0;
+    int streamNum = 1;
+    
+    while (targetIdx < targetSize) {
+        if (streamNum == target[targetIdx]) {
+            result[opsCount] = (char*)malloc(sizeof(char) * 5); 
+            strcpy(result[opsCount], "Push");
+            opsCount++;
+            targetIdx++; 
+        } 
+        else {
+            result[opsCount] = (char*)malloc(sizeof(char) * 5); 
+            strcpy(result[opsCount], "Push");
+            opsCount++;
+            
+            result[opsCount] = (char*)malloc(sizeof(char) * 4); 
+            strcpy(result[opsCount], "Pop");
+            opsCount++;
+        }
+        
+        streamNum++;
+    }
+    
+    *returnSize = opsCount;
+    return result;
+}
