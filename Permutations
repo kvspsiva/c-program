@@ -1,0 +1,39 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void backtrack(int* nums, int numsSize, int start, int*** result, int* returnSize, int** returnColumnSizes) {
+    if (start == numsSize) {
+        *result = (int**)realloc(*result, (*returnSize + 1) * sizeof(int*));
+        (*returnColumnSizes) = (int*)realloc(*returnColumnSizes, (*returnSize + 1) * sizeof(int));
+        
+        (*result)[*returnSize] = (int*)malloc(numsSize * sizeof(int));
+        memcpy((*result)[*returnSize], nums, numsSize * sizeof(int));
+        
+        (*returnColumnSizes)[*returnSize] = numsSize;
+        (*returnSize)++;
+        return;
+    }
+    
+    for (int i = start; i < numsSize; i++) {
+        swap(&nums[start], &nums[i]);             
+        backtrack(nums, numsSize, start + 1, result, returnSize, returnColumnSizes);
+        swap(&nums[start], &nums[i]);           
+    }
+}
+
+int** permute(int* nums, int numsSize, int* returnSize, int** returnColumnSizes) {
+    *returnSize = 0;
+    *returnColumnSizes = NULL;
+    int** result = NULL;
+    
+    backtrack(nums, numsSize, 0, &result, returnSize, returnColumnSizes);
+    
+    return result;
+}
